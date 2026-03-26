@@ -23,7 +23,6 @@ function showCustomAlert(message) {
 
     modalKeyHandler = function(e) {
         e.stopImmediatePropagation();
-        // Close on Escape or Enter
         if (e.key === 'Escape' || e.key === 'Enter') {
             closeModal();
         }
