@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>epstein Game</title>
+    <title>Epstein Game</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <meta property="og:title" content="epstein Game" />
-    <meta property="og:description" content="Play epstein Game, become epstein do everything he does (touch kids) and compete on the global leaderboard!" />
+    <meta property="og:title" content="Epstein Game" />
+    <meta property="og:description" content="Play Epstein Game, become Epstein do everything he does (touch kids) and compete on the global leaderboard!" />
     <meta property="og:image" content="https://epsteingame.vercel.app/embed.png" />
     <meta property="og:url" content="https://epsteingame.vercel.app" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -209,7 +209,7 @@
     <a href="chrome.html" target="_blank" id="chromeWebStoreBtn" class="top-button" style="left:108px;">
         <img src="assets/cws.png" alt="Chrome Web Store" style="width:32px;height:32px;border-radius:8px;">
     </a>
-    <h1 style="color:#fff;">epstein Game</h1>
+    <h1 style="color:#fff;">Epstein Game</h1>
     <div id="mainWrapper">
         <div id="sidebar">
             <div id="score">Score: 0</div>
@@ -329,15 +329,13 @@
             outline: none;
             width: 180px;
         ">
-            <option value="music.mp3">epstein</option>
             <option value="music2.mp3">Touching kids</option>
             <option value="music3.mp3">Baby Oil</option>
             <option value="music4.mp3">Basement</option>
-            <option value="music5.mp3">epstein Blud Calc</option>
             <option value="music6.mp3">caseoh</option>
         </select>
     </div>
-    <audio id="bgMusic" src="music.mp3" loop></audio>
+    <audio id="bgMusic" src="music2.mp3" loop></audio>
     
     <div id="modalOverlay" class="custom-modal-overlay"></div>
     <div id="customModal" class="custom-modal">
@@ -492,13 +490,7 @@
             showPauseMenu(false);
         };
         const firebaseConfig = {
-            apiKey: "apiKey",
-            authDomain: "epsteingame-dfd89.firebaseapp.com",
-            databaseURL: "https://epsteingame-dfd89-default-rtdb.asia-southeast1.firebasedatabase.app/",
-            projectId: "epsteingame-dfd89",
-            storageBucket: "epsteingame-dfd89.appspot.com",
-            messagingSenderId: "662132817791",
-            appId: "1:662132817791:web:7328705ae63440f01e244a"
+            databaseURL: "https://epsteingame-8412b-default-rtdb.asia-southeast1.firebasedatabase.app",
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
