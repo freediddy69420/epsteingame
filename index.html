@@ -47,21 +47,7 @@
             font-size: 32px;
             margin: 4px;
         }
-        canvas:fullscreen {
-            width: 100vw !important;
-            height: 100vh !important;
-            display: block;
-            margin: 0 !important;
-            padding: 0 !important;
-            object-fit: contain;
-            background: #464646 !important;
-        }
-        
-        body:has(canvas:fullscreen) {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-        }
+
         
         button,
         a[role="button"],
@@ -70,7 +56,6 @@
         #volumeBtn,
         #modeBtn,
         #discordBtn,
-        #fullscreenBtn,
         #skinBtn,
         #pauseToggleBtn {
             transition: transform 0.15s, box-shadow 0.15s, background 0.15s, filter 0.15s;
@@ -82,7 +67,6 @@
         #downloadBtn:hover,
         #volumeBtn:hover,
         #modeBtn:hover,
-        #fullscreenBtn:hover,
         #discordBtn:hover
         #skinBtn:hover,
         #pauseToggleBtn:hover {
@@ -225,7 +209,7 @@
     </div>
     <button id="pauseToggleBtn" style="
         position: absolute;
-        top: 188px;
+        top: 104px;
         right: 30px;
         background: none;
         border: none;
@@ -277,23 +261,10 @@
     ">
         <span id="modeEmoji" style="font-size: 32px;">🌑</span>
     </button>
-    <button id="fullscreenBtn" style="
-        position: absolute;
-        top: 146px;
-        right: 30px;
-        background: none;
-        border: none;
-        font-size: 32px;
-        color: #fff;
-        cursor: pointer;
-        z-index: 20;
-        outline: none;
-    ">
-        🖥️
-    </button>
+
     <button id="musicNoteBtn" style="
         position: absolute;
-        top: 230px;
+        top: 188px;
         right: 30px;
         background: none;
         border: none;
@@ -308,7 +279,7 @@
     <div id="musicPopup" style="
         display: none;
         position: absolute;
-        top: 272px;
+        top: 230px;
         right: 30px;
         background: #222;
         color: #fff;
@@ -457,7 +428,14 @@
         let speedPowerup = null;
         let speedBoostActive = false;
         let speedBoostTimer = 0;
-        let gameSpeed = 100;
+        let turtlePowerup = null;
+        let turtleSlowActive = false;
+        let turtleSlowExpiresAt = 0;
+        const turtleSlowDurationMs = 30000;
+        const normalSpeed = 100;
+        const speedBoostSpeed = 50;
+        const turtleSlowSpeed = 200;
+        let gameSpeed = normalSpeed;
         let gameInterval;
         let highscore = localStorage.getItem('epsteinHighScore') ? parseInt(localStorage.getItem('epsteinHighScore')) : 0;
         document.getElementById('highscore').textContent = "High Score: " + highscore;
@@ -606,6 +584,7 @@
                         !(powerup && powerup.x === x && powerup.y === y) &&
                         !(invincibilityPowerup && invincibilityPowerup.x === x && invincibilityPowerup.y === y) &&
                         !(speedPowerup && speedPowerup.x === x && speedPowerup.y === y) &&
+                        !(turtlePowerup && turtlePowerup.x === x && turtlePowerup.y === y) &&
                         !police.some(p => p.x === x && p.y === y);
             }
             police.push({x, y});
@@ -617,7 +596,8 @@
                 const x = Math.floor(Math.random() * tileCount);
                 const y = Math.floor(Math.random() * tileCount);
                 valid = !snake.some(segment => segment.x === x && segment.y === y) &&
-                        !(child.x === x && child.y === y);
+                        !(child.x === x && child.y === y) &&
+                        !(turtlePowerup && turtlePowerup.x === x && turtlePowerup.y === y);
                 if (valid) powerup = {x, y};
             }
         }
@@ -628,7 +608,8 @@
                 const y = Math.floor(Math.random() * tileCount);
                 valid = !snake.some(segment => segment.x === x && segment.y === y) &&
                         !(child.x === x && child.y === y) &&
-                        !(powerup && powerup.x === x && powerup.y === y);
+                        !(powerup && powerup.x === x && powerup.y === y) &&
+                        !(turtlePowerup && turtlePowerup.x === x && turtlePowerup.y === y);
                 if (valid) invincibilityPowerup = {x, y};
             }
         }
@@ -645,6 +626,23 @@
             }
         }
 
+        function placeTurtlePowerup() {
+            let valid = false;
+            while (!valid) {
+                const x = Math.floor(Math.random() * tileCount);
+                const y = Math.floor(Math.random() * tileCount);
+                valid = !snake.some(segment => segment.x === x && segment.y === y) &&
+                        !(child.x === x && child.y === y) &&
+                        !(powerup && powerup.x === x && powerup.y === y) &&
+                        !(invincibilityPowerup && invincibilityPowerup.x === x && invincibilityPowerup.y === y) &&
+                        !(speedPowerup && speedPowerup.x === x && speedPowerup.y === y) &&
+                        !(lawyerPowerup && lawyerPowerup.x === x && lawyerPowerup.y === y) &&
+                        !(heartPowerup && heartPowerup.x === x && heartPowerup.y === y) &&
+                        !police.some(p => p.x === x && p.y === y);
+                if (valid) turtlePowerup = {x, y};
+            }
+        }
+
         let lawyerPowerup = null;
         let lawyerActive = false;
         function placeLawyerPowerup() {
@@ -658,6 +656,7 @@
                         !(invincibilityPowerup && invincibilityPowerup.x === x && invincibilityPowerup.y === y) &&
                         !(speedPowerup && speedPowerup.x === x && speedPowerup.y === y) &&
                         !(lawyerPowerup && lawyerPowerup.x === x && lawyerPowerup.y === y) &&
+                        !(turtlePowerup && turtlePowerup.x === x && turtlePowerup.y === y) &&
                         !police.some(p => p.x === x && p.y === y);
                 if (valid) lawyerPowerup = {x, y};
             }
@@ -677,6 +676,7 @@
                         !(speedPowerup && speedPowerup.x === x && speedPowerup.y === y) &&
                         !(lawyerPowerup && lawyerPowerup.x === x && lawyerPowerup.y === y) &&
                         !(heartPowerup && heartPowerup.x === x && heartPowerup.y === y) &&
+                        !(turtlePowerup && turtlePowerup.x === x && turtlePowerup.y === y) &&
                         !police.some(p => p.x === x && p.y === y);
                 if (valid) heartPowerup = {x, y};
             }
@@ -726,6 +726,12 @@
                     if (score === 25 && !speedPowerup) {
                         placeSpeedPowerup();
                     }
+                    if (score === 20 && !turtlePowerup) {
+                        placeTurtlePowerup();
+                    }
+                    if (score !== 20 && !turtlePowerup && Math.random() < 0.0075) {
+                        placeTurtlePowerup();
+                    }
                     if (score === 50 && !invincibilityPowerup) {
                         placeInvincibilityPowerup();
                     }
@@ -747,8 +753,15 @@
                 } else if (speedPowerup && head.x === speedPowerup.x && head.y === speedPowerup.y) {
                     speedBoostActive = true;
                     speedBoostTimer = 100;
+                    turtleSlowActive = false;
                     speedPowerup = null;
-                    setGameSpeed(gameSpeed / 2);
+                    updateGameSpeed();
+                } else if (turtlePowerup && head.x === turtlePowerup.x && head.y === turtlePowerup.y) {
+                    turtleSlowActive = true;
+                    turtleSlowExpiresAt = Date.now() + turtleSlowDurationMs;
+                    speedBoostActive = false;
+                    turtlePowerup = null;
+                    updateGameSpeed();
                 } else if (invincibilityPowerup && head.x === invincibilityPowerup.x && head.y === invincibilityPowerup.y) {
                     invincible = true;
                     invincibilityTimer = 100;
@@ -810,12 +823,15 @@
                     speedPowerup = null;
                     speedBoostActive = false;
                     speedBoostTimer = 0;
+                    turtlePowerup = null;
+                    turtleSlowActive = false;
+                    turtleSlowExpiresAt = 0;
                     police = [];
                     lawyerPowerup = null;
                     lawyerActive = false;
                     heartPowerup = null;
                     extraLives = 0;
-                    setGameSpeed(100);
+                    updateGameSpeed();
                     return;
                 }
             }
@@ -834,13 +850,18 @@
                 speedBoostTimer--;
                 if (speedBoostTimer <= 0) {
                     speedBoostActive = false;
-                    setGameSpeed(100);
+                    updateGameSpeed();
                 }
+            }
+            if (turtleSlowActive && Date.now() >= turtleSlowExpiresAt) {
+                turtleSlowActive = false;
+                updateGameSpeed();
             }
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawTile(child.x, child.y, childEmoji);
             if (powerup) drawTile(powerup.x, powerup.y, "🧴");
             if (speedPowerup) drawTile(speedPowerup.x, speedPowerup.y, "⚡");
+            if (turtlePowerup) drawTile(turtlePowerup.x, turtlePowerup.y, "🐢");
             if (invincibilityPowerup) drawTile(invincibilityPowerup.x, invincibilityPowerup.y, "🛡️");
             if (lawyerPowerup) drawTile(lawyerPowerup.x, lawyerPowerup.y, "🧑🏻‍⚖️");
             if (heartPowerup) drawTile(heartPowerup.x, heartPowerup.y, "❤️");
@@ -858,6 +879,13 @@
                 ctx.save();
                 ctx.globalAlpha = 0.2;
                 ctx.fillStyle = "#ffff00";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.restore();
+            }
+            if (turtleSlowActive) {
+                ctx.save();
+                ctx.globalAlpha = 0.2;
+                ctx.fillStyle = "#00bfff";
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 ctx.restore();
             }
@@ -900,6 +928,12 @@
             gameSpeed = ms;
             clearInterval(gameInterval);
             gameInterval = setInterval(gameLoop, gameSpeed);
+        }
+        function updateGameSpeed() {
+            let targetSpeed = normalSpeed;
+            if (turtleSlowActive) targetSpeed = turtleSlowSpeed;
+            else if (speedBoostActive) targetSpeed = speedBoostSpeed;
+            if (targetSpeed !== gameSpeed) setGameSpeed(targetSpeed);
         }
         let lastInputTime = 0;
         const inputDelay = 60;
@@ -989,7 +1023,7 @@
         const skinBtn = document.createElement('button');
         skinBtn.id = "skinBtn";
         skinBtn.style.position = "absolute";
-        skinBtn.style.top = "104px";
+        skinBtn.style.top = "146px";
         skinBtn.style.right = "30px";
         skinBtn.style.background = "none";
         skinBtn.style.border = "none";
@@ -1004,16 +1038,7 @@
             childEmoji = childSkins[childSkinIndex];
             skinBtn.textContent = childEmoji;
         };
-        const fullscreenBtn = document.getElementById('fullscreenBtn');
-        fullscreenBtn.onclick = function() {
-            if (!document.fullscreenElement) {
-                canvas.requestFullscreen().catch(err => {
-                    console.error(`Error requesting fullscreen: ${err.message}`);
-                });
-            } else {
-                document.exitFullscreen();
-            }
-        };
+
     let musicPlaying = false;
     soundSelect.onchange = function() {
         const wasPlaying = musicPlaying;
